@@ -1,7 +1,8 @@
+
 """
 SmartDesk - Conversation History Manager
 
-Stores chatbot conversations in JSON format.
+Stores conversation history and calculates statistics.
 """
 
 import json
@@ -9,10 +10,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-# Project data folder
 DATA_FOLDER = Path(__file__).resolve().parent.parent / "data"
-
-# Conversation history file
 HISTORY_FILE = DATA_FOLDER / "chat_history.json"
 
 
@@ -61,3 +59,27 @@ def clear_history():
 
     with open(HISTORY_FILE, "w", encoding="utf-8") as file:
         json.dump([], file, indent=4)
+
+
+def get_statistics():
+    """Calculate conversation statistics."""
+
+    history = load_history()
+
+    total_messages = len(history)
+    user_messages = 0
+    chatbot_messages = 0
+
+    for entry in history:
+        sender = entry.get("sender", "").strip().lower()
+
+        if sender == "smartdesk":
+            chatbot_messages += 1
+        else:
+            user_messages += 1
+
+    return {
+        "total_messages": total_messages,
+        "user_messages": user_messages,
+        "chatbot_messages": chatbot_messages
+    }
