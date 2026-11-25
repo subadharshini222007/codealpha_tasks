@@ -1,19 +1,47 @@
 
 """
-SmartDesk - Rule-Based Chatbot Engine
+SmartDesk - Intelligent Rule-Based Chatbot
 
-Uses if-elif conditions, functions and predefined replies.
+Handles user input and generates predefined responses
+using keyword matching and if-elif conditions.
 """
 
-from chatbot.responses import RESPONSES, FALLBACK_RESPONSES
-from chatbot.responses import get_random_response
+import re
+
+from chatbot.responses import (
+    RESPONSES,
+    FALLBACK_RESPONSES,
+    get_random_response
+)
+
 
 def normalize_input(user_input):
-    """Convert user input into lowercase and remove extra spaces."""
+    """Convert input to lowercase and remove extra spaces."""
     return " ".join(user_input.lower().strip().split())
 
+
+def matches_keyword(message, keywords):
+    """Check whether the message contains any given keyword."""
+
+    for keyword in keywords:
+        keyword = keyword.lower().strip()
+
+        pattern = r"\b" + re.escape(keyword) + r"\b"
+
+        if re.search(pattern, message):
+            return True
+
+    return False
+
+
 def get_response(user_input):
-    """Generate a predefined response based on user input."""
+    """
+    Generate a chatbot response.
+
+    Returns:
+        response: Chatbot reply
+        should_exit: True when the user wants to end the chat
+    """
 
     message = normalize_input(user_input)
 
@@ -21,40 +49,86 @@ def get_response(user_input):
         return "Please enter a message.", False
 
     # Greeting
-    if message in ["hello", "hi", "hey", "hii", "good morning", "good evening"]:
-        response = get_random_response(RESPONSES["greeting"]["replies"])
+    if (
+        matches_keyword(message, RESPONSES["greeting"]["keywords"])
+        or matches_keyword(message, ["hii"])
+    ):
+        response = get_random_response(
+            RESPONSES["greeting"]["replies"]
+        )
+        return response, False
 
     # How are you
-    elif message in ["how are you", "how are you doing", "are you fine"]:
-        response = get_random_response(RESPONSES["how_are_you"]["replies"])
+    elif matches_keyword(
+        message,
+        RESPONSES["how_are_you"]["keywords"]
+    ):
+        response = get_random_response(
+            RESPONSES["how_are_you"]["replies"]
+        )
+        return response, False
 
     # Chatbot name
-    elif message in ["your name", "what is your name", "who are you"]:
-        response = get_random_response(RESPONSES["name"]["replies"])
+    elif matches_keyword(
+        message,
+        RESPONSES["name"]["keywords"]
+    ):
+        response = get_random_response(
+            RESPONSES["name"]["replies"]
+        )
+        return response, False
 
     # Python information
-    elif message in ["python", "what is python", "tell me about python"]:
-        response = get_random_response(RESPONSES["python"]["replies"])
+    elif matches_keyword(
+        message,
+        RESPONSES["python"]["keywords"]
+    ):
+        response = get_random_response(
+            RESPONSES["python"]["replies"]
+        )
+        return response, False
 
     # Chatbot capabilities
-    elif message in ["what can you do", "your features", "your capabilities"]:
-        response = get_random_response(RESPONSES["capabilities"]["replies"])
+    elif matches_keyword(
+        message,
+        RESPONSES["capabilities"]["keywords"]
+    ):
+        response = get_random_response(
+            RESPONSES["capabilities"]["replies"]
+        )
+        return response, False
 
     # Thank you
-    elif message in ["thank you", "thanks", "thank"]:
-        response = get_random_response(RESPONSES["thanks"]["replies"])
+    elif matches_keyword(
+        message,
+        RESPONSES["thanks"]["keywords"]
+    ):
+        response = get_random_response(
+            RESPONSES["thanks"]["replies"]
+        )
+        return response, False
 
     # Help
-    elif message in ["help", "commands", "what should i ask"]:
-        response = get_random_response(RESPONSES["help"]["replies"])
+    elif matches_keyword(
+        message,
+        RESPONSES["help"]["keywords"]
+    ):
+        response = get_random_response(
+            RESPONSES["help"]["replies"]
+        )
+        return response, False
 
     # Goodbye
-    elif message in ["bye", "goodbye", "exit", "quit"]:
-        response = get_random_response(RESPONSES["goodbye"]["replies"])
+    elif matches_keyword(
+        message,
+        RESPONSES["goodbye"]["keywords"]
+    ):
+        response = get_random_response(
+            RESPONSES["goodbye"]["replies"]
+        )
         return response, True
 
     # Unknown input
     else:
         response = get_random_response(FALLBACK_RESPONSES)
-
-    return response, False
+        return response, False
